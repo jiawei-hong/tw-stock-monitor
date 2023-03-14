@@ -13,15 +13,27 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "*"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "tw-stock-monitor.helloWorld",
-        "title": "Hello World"
+        "title": "TwStock: change listen stock code",
+        "command": "tw-stock-monitor.input"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "tw-stock-monitor",
+      "properties": {
+        "tw-stokc-monitor-id": {
+          "type": "string",
+          "default": "2330",
+          "description": "輸入股票代碼"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
@@ -32,16 +44,18 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.76.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
+    "@types/vscode": "^1.76.0",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
+    "@vscode/test-electron": "^2.2.3",
+    "axios": "^1.3.4",
     "eslint": "^8.34.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
-    "typescript": "^4.9.5",
-    "@vscode/test-electron": "^2.2.3"
+    "typescript": "^4.9.5"
   }
 }
