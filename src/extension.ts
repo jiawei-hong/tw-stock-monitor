@@ -1,26 +1,59 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+import type { GetStockInfoResponse } from "./api";
+import { getStockInfo } from "./api";
+import {
+  TW_STOCK_COLOR_GREEN,
+  TW_STOCK_COLOR_RED,
+  TW_STOCK_MONITOR_INPUT,
+} from "./constants";
+
+const statusBarItem: vscode.StatusBarItem = vscode.window.createStatusBarItem(
+  vscode.StatusBarAlignment.Right,
+  100
+);
+
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "tw-stock-monitor" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('tw-stock-monitor.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from tw-stock-monitor!');
-	});
-
-	context.subscriptions.push(disposable);
+  context.subscriptions.push(
+    vscode.commands.registerCommand(TW_STOCK_MONITOR_INPUT, async () => {
+      vscode.window
+        .showInputBox({ placeHolder: "query stock information" })
+        .then((value) => {
+          if (value) {
+            context.workspaceState.update("stockId", value);
+            updateStatusBarItem(context);
+          }
+        });
+    })
+  );
+  updateStatusBarItem(context);
 }
 
-// This method is called when your extension is deactivated
+function updateStatusBarItem(context: vscode.ExtensionContext) {
+  const workspaceStateStockId: string | undefined =
+    context.workspaceState.get("stockId");
+
+  if (workspaceStateStockId) {
+    getStockInfo(workspaceStateStockId).then(
+      (stockInfo: GetStockInfoResponse) => {
+        const {
+          stockId,
+          stockName,
+          stockPrice,
+          stockChange,
+          stockChangePercent,
+          stockTodayChange,
+        } = stockInfo;
+        statusBarItem.text = `${stockId} ${stockTodayChange} ${stockChangePercent.toFixed(
+          2
+        )}%`;
+        statusBarItem.color =
+          stockChangePercent > 0 ? TW_STOCK_COLOR_RED : TW_STOCK_COLOR_GREEN;
+        statusBarItem.tooltip = `${stockId} ${stockName} ${stockPrice} ${stockChange} ${stockChangePercent}%`;
+        statusBarItem.show();
+      }
+    );
+  }
+}
+
 export function deactivate() {}
