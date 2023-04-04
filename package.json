@@ -27,7 +27,7 @@
     "configuration": {
       "title": "tw-stock-monitor",
       "properties": {
-        "tw-stokc-monitor-id": {
+        "tw-stock-monitor.input": {
           "type": "string",
           "default": "2330",
           "description": "輸入股票代碼"
