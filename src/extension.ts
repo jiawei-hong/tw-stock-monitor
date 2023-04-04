@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
 
-import type { GetStockInfoResponse } from "./api";
 import { getStockInfo } from "./api";
 import {
+  TW_STCK_DEFAULT_REFETCH_INTERVAL,
   TW_STOCK_COLOR_GREEN,
   TW_STOCK_COLOR_RED,
   TW_STOCK_MONITOR_INPUT,
@@ -21,39 +21,37 @@ export function activate(context: vscode.ExtensionContext) {
         .then((value) => {
           if (value) {
             context.workspaceState.update("stockId", value);
-            updateStatusBarItem(context);
+            updateStatusBarItem();
           }
         });
     })
   );
-  updateStatusBarItem(context);
+
+  updateStatusBarItem();
+  setInterval(() => {
+    updateStatusBarItem();
+  }, TW_STCK_DEFAULT_REFETCH_INTERVAL);
 }
 
-function updateStatusBarItem(context: vscode.ExtensionContext) {
-  const workspaceStateStockId: string | undefined =
-    context.workspaceState.get("stockId");
-
-  if (workspaceStateStockId) {
-    getStockInfo(workspaceStateStockId).then(
-      (stockInfo: GetStockInfoResponse) => {
-        const {
-          stockId,
-          stockName,
-          stockPrice,
-          stockChange,
-          stockChangePercent,
-          stockTodayChange,
-        } = stockInfo;
-        statusBarItem.text = `${stockId} ${stockTodayChange} ${stockChangePercent.toFixed(
-          2
-        )}%`;
-        statusBarItem.color =
-          stockChangePercent > 0 ? TW_STOCK_COLOR_RED : TW_STOCK_COLOR_GREEN;
-        statusBarItem.tooltip = `${stockId} ${stockName} ${stockPrice} ${stockChange} ${stockChangePercent}%`;
-        statusBarItem.show();
-      }
-    );
+const choiceColor = (stockChangePercent: number) => {
+  if (stockChangePercent === 0) {
+    return "#FFF";
   }
+  return stockChangePercent > 0 ? TW_STOCK_COLOR_RED : TW_STOCK_COLOR_GREEN;
+};
+
+function updateStatusBarItem() {
+  const config = vscode.workspace.getConfiguration("tw-stock-monitor");
+  const stockId: string = config.get("input") || "2330";
+
+  getStockInfo(stockId).then((stockInfo) => {
+    const { stockName, stockPrice, stockChangePercent, stockTodayChange } =
+      stockInfo;
+
+    statusBarItem.text = `${stockName} ${stockPrice} ${stockTodayChange} (${stockChangePercent}%)`;
+    statusBarItem.color = choiceColor(stockChangePercent);
+    statusBarItem.show();
+  });
 }
 
 export function deactivate() {}

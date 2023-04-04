@@ -1,0 +1,60 @@
+export type QueryTime = {
+  sessionFromTime: number;
+  sessionLatestTime: number;
+  sessionStr: string;
+  showChart: boolean;
+  stockInfo: number;
+  stockInfoItem: number;
+  sysTime: string;
+  sysDate: string;
+};
+
+export type Stock = {
+  a: string;
+  b: string;
+  bp: string;
+  c: string;
+  ch: string;
+  d: string;
+  ex: string;
+  f: string;
+  fv: string;
+  g: string;
+  h: string;
+  i: string;
+  ip: string;
+  it: string;
+  l: string;
+  mt: string;
+  n: string;
+  nf: string;
+  o: string;
+  oa: string;
+  ob: string;
+  ot: string;
+  ov: string;
+  oz: string;
+  p: string;
+  ps: string;
+  pz: string;
+  s: string;
+  tlong: string;
+  ts: string;
+  tv: string;
+  u: string;
+  v: string;
+  w: string;
+  y: string;
+  z: string;
+};
+
+export type GetStockResponse = {
+  cacheAlive: boolean;
+  exKey: string;
+  msgArray: Stock;
+  queryTime: QueryTime;
+  referer: string;
+  rtcode: string;
+  rtmessage: string;
+  userDelay: number;
+};
